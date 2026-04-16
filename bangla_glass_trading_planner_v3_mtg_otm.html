@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>বাংলা গ্লাস UI ট্রেডিং প্ল্যানার Pro MTG OTM</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Hind Siliguri", "Noto Sans Bengali", "Segoe UI", sans-serif; }
+
+    :root {
+      --bg1: #0a0f24; --bg2: #1b1035; --bg3: #081a2f;
+      --glass: rgba(255,255,255,0.10); --border: rgba(255,255,255,0.16);
+      --cyan: #67f7ff; --blue: #63a6ff; --pink: #ff7edb; --purple: #9c7dff;
+      --green: #7dffb2; --red: #ff7d9f; --yellow: #ffd76e; --orange: #ffae57;
+      --text: #f4fbff; --soft: #d7ecff;
+      --activeGlow: 0 0 22px rgba(103,247,255,0.30), 0 0 45px rgba(255,126,219,0.18);
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(0,255,255,0.20), transparent 24%),
+        radial-gradient(circle at 85% 12%, rgba(255,0,200,0.14), transparent 24%),
+        radial-gradient(circle at 75% 82%, rgba(255,200,0,0.10), transparent 24%),
+        radial-gradient(circle at 30% 90%, rgba(130,120,255,0.14), transparent 20%),
+        linear-gradient(135deg, var(--bg1), var(--bg3) 42%, var(--bg2));
+      color: var(--text); padding: 18px; overflow-x: hidden;
+    }
+
+    body::before {
+      content: ""; position: fixed; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 30px 30px; opacity: 0.55;
+    }
+
+    .container { max-width: 1380px; margin: auto; }
+    .hero {
+      text-align: center; margin-bottom: 22px; padding: 28px 20px; border-radius: 30px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(18px);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.30), 0 0 35px rgba(103,247,255,0.10), 0 0 50px rgba(255,126,219,0.06);
+    }
+    .hero h1 {
+      font-size: 2.5rem; min-height: 62px; color: var(--cyan);
+      text-shadow: 0 0 10px rgba(103,247,255,0.8), 0 0 24px rgba(103,247,255,0.35), 0 0 40px rgba(255,126,219,0.20);
+    }
+    .glow-text { text-shadow: 0 0 8px rgba(103,247,255,0.55), 0 0 16px rgba(255,126,219,0.25), 0 0 28px rgba(99,166,255,0.20); }
+    .cursor { display: inline-block; width: 10px; color: var(--pink); animation: blink 0.8s infinite; text-shadow: 0 0 12px rgba(255,126,219,0.8); }
+    @keyframes blink { 50% { opacity: 0; } }
+    .hero p { color: var(--soft); margin-top: 8px; line-height: 1.7; font-size: 1rem; }
+    .badge-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .badge {
+      padding: 8px 14px; border-radius: 999px;
+      background: linear-gradient(90deg, rgba(103,247,255,0.12), rgba(255,126,219,0.12));
+      border: 1px solid rgba(255,255,255,0.12); color: #e8fbff; font-size: 0.9rem;
+      box-shadow: 0 0 16px rgba(103,247,255,0.08);
+    }
+
+    .layout { display: grid; grid-template-columns: 430px 1fr; gap: 18px; }
+    .card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05));
+      border: 1px solid var(--border); border-radius: 26px; padding: 20px; backdrop-filter: blur(18px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 26px rgba(103,247,255,0.07), 0 0 26px rgba(255,126,219,0.05);
+      margin-bottom: 18px;
+    }
+    .card h2 { color: var(--pink); font-size: 1.15rem; margin-bottom: 14px; text-shadow: 0 0 14px rgba(255,126,219,0.28); }
+    .section-title { font-size: 0.92rem; color: #c9fbff; margin: 14px 0 10px; }
+    .form-group { margin-bottom: 13px; }
+    label { display: block; margin-bottom: 7px; color: #e5f8ff; font-size: 0.95rem; text-shadow: 0 0 8px rgba(103,247,255,0.12); }
+    input, select {
+      width: 100%; padding: 13px 14px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(7,12,27,0.60); color: white; outline: none; transition: 0.25s ease; font-size: 0.97rem;
+      box-shadow: inset 0 0 15px rgba(255,255,255,0.02);
+    }
+    input:focus, select:focus { border-color: rgba(103,247,255,0.50); box-shadow: 0 0 16px rgba(103,247,255,0.18), 0 0 30px rgba(255,126,219,0.08); }
+
+    .preset-grid, .action-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px;
+    }
+
+    .preset-btn, .action-btn, .mini-btn {
+      padding: 11px 12px; border: none; border-radius: 14px; cursor: pointer; font-weight: 800; color: white;
+      border: 1px solid rgba(255,255,255,0.12); transition: 0.22s ease;
+    }
+    .preset-btn { background: linear-gradient(90deg, rgba(103,247,255,0.18), rgba(255,126,219,0.18)); }
+    .action-btn.win-btn { background: linear-gradient(90deg, rgba(125,255,178,0.25), rgba(103,247,255,0.18)); }
+    .action-btn.loss-btn { background: linear-gradient(90deg, rgba(255,125,159,0.25), rgba(255,174,87,0.16)); }
+    .action-btn.reset-mini, .mini-btn { background: linear-gradient(90deg, rgba(156,125,255,0.22), rgba(255,126,219,0.18)); }
+    .preset-btn:hover, .action-btn:hover, button.main-btn:hover, .mini-btn:hover { transform: translateY(-2px); box-shadow: var(--activeGlow); }
+    .active-click {
+      transform: scale(0.98); filter: brightness(1.08);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.12), var(--activeGlow) !important;
+    }
+
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    button.main-btn {
+      flex: 1; min-width: 120px; padding: 13px 16px; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; transition: 0.25s ease;
+    }
+    .primary { background: linear-gradient(90deg, var(--cyan), var(--blue)); color: #04121b; box-shadow: 0 0 18px rgba(103,247,255,0.22); }
+    .secondary { background: linear-gradient(90deg, var(--pink), var(--purple)); color: white; box-shadow: 0 0 18px rgba(255,126,219,0.18); }
+
+    .tips {
+      margin-top: 14px; padding: 14px; border-radius: 16px;
+      background: linear-gradient(90deg, rgba(103,247,255,0.08), rgba(255,126,219,0.08));
+      border: 1px solid rgba(255,255,255,0.08); color: #eefbff; line-height: 1.7; font-size: 0.93rem;
+    }
+
+    .stats-grid, .mtg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .stat {
+      min-height: 110px; border-radius: 18px; padding: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.10); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); transition: 0.25s ease;
+    }
+    .stat:hover { transform: translateY(-2px); box-shadow: var(--activeGlow); }
+    .stat small { display: block; color: #d5f5ff; font-size: 0.87rem; line-height: 1.4; margin-bottom: 7px; text-shadow: 0 0 8px rgba(103,247,255,0.10); }
+    .value { font-size: 1.34rem; font-weight: 800; word-break: break-word; text-shadow: 0 0 10px rgba(255,255,255,0.08); }
+    .cyan { color: var(--cyan); text-shadow: 0 0 12px rgba(103,247,255,0.45); }
+    .pink { color: var(--pink); text-shadow: 0 0 12px rgba(255,126,219,0.38); }
+    .green { color: var(--green); text-shadow: 0 0 12px rgba(125,255,178,0.40); }
+    .red { color: var(--red); text-shadow: 0 0 12px rgba(255,125,159,0.36); }
+    .yellow { color: var(--yellow); text-shadow: 0 0 12px rgba(255,215,110,0.35); }
+    .orange { color: var(--orange); text-shadow: 0 0 12px rgba(255,174,87,0.35); }
+    .full { grid-column: 1 / -1; }
+
+    .progress-card, .summary-card, .goal-card, .table-card {
+      padding: 16px; border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .progress-head { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; color: #ecfbff; margin-bottom: 10px; font-size: 0.95rem; }
+    .bar-wrap {
+      width: 100%; height: 18px; border-radius: 999px; overflow: hidden;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.10);
+    }
+    .bar {
+      width: 0%; height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--pink), var(--yellow));
+      box-shadow: 0 0 18px rgba(103,247,255,0.20), 0 0 30px rgba(255,126,219,0.12); transition: width 0.45s ease;
+    }
+    .summary-card, .goal-card, .table-card { line-height: 1.75; color: #f1fbff; font-size: 0.97rem; }
+    .summary-card b, .goal-card b, .table-card b { color: var(--cyan); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.92rem;
+    }
+    th, td {
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      padding: 10px 8px;
+      text-align: left;
+    }
+    th { color: var(--yellow); }
+    tr:last-child td { border-bottom: none; }
+
+    .footer {
+      margin-top: 18px; text-align: center; padding: 18px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.08); color: #e5f1ff; line-height: 1.8;
+    }
+    .footer a { color: var(--cyan); text-decoration: none; font-weight: 700; text-shadow: 0 0 12px rgba(103,247,255,0.28); }
+    .footer a:hover { color: var(--pink); }
+
+    @media (max-width: 1080px) {
+      .layout { grid-template-columns: 1fr; }
+      .stats-grid, .mtg-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 680px) {
+      .stats-grid, .mtg-grid { grid-template-columns: 1fr; }
+      .preset-grid, .action-grid { grid-template-columns: 1fr 1fr; }
+      .hero h1 { font-size: 1.95rem; min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1><span id="typingText" class="glow-text"></span><span class="cursor">|</span></h1>
+      <p class="glow-text">টার্গেট, win/loss, MTG step, OTM style calculator — সব এক জায়গায়।</p>
+      <div class="badge-row">
+        <div class="badge">বাংলা UI</div>
+        <div class="badge">MTG System</div>
+        <div class="badge">OTM Calculator</div>
+        <div class="badge">Win/Loss Buttons</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div>
+        <div class="card">
+          <h2 class="glow-text">ইনপুট প্যানেল</h2>
+
+          <div class="section-title glow-text">Quick Preset</div>
+          <div class="preset-grid">
+            <button class="preset-btn" onclick="setPreset(30,4,1,85,this)">30 → 4</button>
+            <button class="preset-btn" onclick="setPreset(50,5,1,85,this)">50 → 5</button>
+            <button class="preset-btn" onclick="setPreset(100,10,2,85,this)">100 → 10</button>
+          </div>
+
+          <div class="section-title glow-text">Quick Win/Loss</div>
+          <div class="action-grid">
+            <button class="action-btn win-btn" onclick="addWin(this)">+ ১ Win</button>
+            <button class="action-btn loss-btn" onclick="addLoss(this)">+ ১ Loss</button>
+            <button class="action-btn reset-mini" onclick="resetSessionStats(this)">Session Reset</button>
+          </div>
+
+          <div class="form-group"><label>বর্তমান ব্যালেন্স ($)</label><input type="number" id="balance" value="30" min="1" step="0.01"></div>
+          <div class="form-group"><label>আজকের টার্গেট প্রফিট ($)</label><input type="number" id="targetProfit" value="4" min="0.01" step="0.01"></div>
+          <div class="form-group"><label>এখন পর্যন্ত মোট প্রফিট / লস ($)</label><input type="number" id="currentProfit" value="0" step="0.01"></div>
+          <div class="form-group"><label>প্রতি ট্রেড amount ($)</label><input type="number" id="tradeAmount" value="1" min="0.01" step="0.01"></div>
+          <div class="form-group"><label>Payout (%)</label><input type="number" id="payout" value="85" min="1" max="100" step="0.1"></div>
+          <div class="form-group"><label>এখন পর্যন্ত win</label><input type="number" id="wins" value="0" min="0" step="1"></div>
+          <div class="form-group"><label>এখন পর্যন্ত loss</label><input type="number" id="losses" value="0" min="0" step="1"></div>
+          <div class="form-group"><label>দৈনিক risk limit (%)</label><input type="number" id="riskPercent" value="10" min="1" max="100" step="0.1"></div>
+          <div class="form-group"><label>সর্বোচ্চ consecutive loss limit</label><input type="number" id="maxLossStreak" value="3" min="1" step="1"></div>
+
+          <div class="btns">
+            <button class="main-btn primary" onclick="calculatePlan(); flashButton(this)">হিসাব দেখাও</button>
+            <button class="main-btn secondary" onclick="resetForm(); flashButton(this)">রিসেট</button>
+          </div>
+
+          <div class="tips glow-text">
+            এই টুলটি শুধুই হিসাব ও পরিকল্পনার জন্য। MTG/OTM অংশেও কোনো নিশ্চিত লাভ দেখায় না—শুধু সম্ভাব্য recovery size দেখায়।
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="glow-text">MTG / OTM সিস্টেম</h2>
+
+          <div class="form-group"><label>Mode</label>
+            <select id="mode" onchange="calculateMTG()">
+              <option value="mtg">MTG Recovery</option>
+              <option value="otm">OTM Fixed Multiplier</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Base Amount ($)</label><input type="number" id="mtgBase" value="1" min="0.01" step="0.01" oninput="calculateMTG()"></div>
+          <div class="form-group"><label>Step সংখ্যা</label><input type="number" id="mtgSteps" value="4" min="1" max="10" step="1" oninput="calculateMTG()"></div>
+          <div class="form-group"><label>MTG multiplier / OTM ratio</label><input type="number" id="mtgMultiplier" value="2" min="1" step="0.1" oninput="calculateMTG()"></div>
+          <div class="form-group"><label>Extra target profit ($)</label><input type="number" id="extraTarget" value="0.20" min="0" step="0.01" oninput="calculateMTG()"></div>
+
+          <div class="mtg-grid">
+            <div class="stat"><small>মোট exposure</small><div class="value orange" id="mtgTotalExposure">$0.00</div></div>
+            <div class="stat"><small>শেষ step amount</small><div class="value pink" id="mtgLastStep">$0.00</div></div>
+            <div class="stat"><small>শেষ step এ expected payout</small><div class="value cyan" id="mtgLastReturn">$0.00</div></div>
+          </div>
+
+          <div class="table-card full" id="mtgTableCard">
+            এখানে MTG / OTM step table দেখাবে।
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2 class="glow-text">রেজাল্ট ড্যাশবোর্ড</h2>
+
+          <div class="stats-grid">
+            <div class="stat"><small>একটা winning trade এ লাভ</small><div class="value cyan" id="profitPerWin">$0.00</div></div>
+            <div class="stat"><small>টার্গেট পূরণে আর কত $ দরকার</small><div class="value pink" id="remainingProfit">$0.00</div></div>
+            <div class="stat"><small>টার্গেট কত % পূরণ হয়েছে</small><div class="value green" id="targetPercent">0%</div></div>
+            <div class="stat"><small>আর কয়টা clean win লাগবে</small><div class="value cyan" id="winsNeeded">0</div></div>
+            <div class="stat"><small>এখন পর্যন্ত মোট ট্রেড</small><div class="value yellow" id="totalTrades">0</div></div>
+            <div class="stat"><small>এখন পর্যন্ত session result</small><div class="value green" id="netResult">$0.00</div></div>
+            <div class="stat"><small>win rate</small><div class="value cyan" id="winRate">0%</div></div>
+            <div class="stat"><small>loss streak limit পর্যন্ত মোট লস</small><div class="value red" id="streakLoss">$0.00</div></div>
+            <div class="stat"><small>suggested stop loss</small><div class="value red" id="stopLoss">$0.00</div></div>
+            <div class="stat"><small>risk level</small><div class="value yellow" id="riskLevel">-</div></div>
+            <div class="stat"><small>১টা win হলে বাকি target</small><div class="value green" id="afterOneWin">$0.00</div></div>
+            <div class="stat"><small>১টা loss হলে বাকি target</small><div class="value red" id="afterOneLoss">$0.00</div></div>
+            <div class="stat"><small>target balance</small><div class="value pink" id="targetBalance">$0.00</div></div>
+            <div class="stat"><small>আজকের exposure</small><div class="value orange" id="exposure">$0.00</div></div>
+            <div class="stat"><small>session status</small><div class="value cyan" id="sessionStatus">-</div></div>
+            <div class="stat"><small>recommendation</small><div class="value" id="recommendation">-</div></div>
+
+            <div class="progress-card full">
+              <div class="progress-head">
+                <span>টার্গেট প্রগ্রেস</span>
+                <span id="progressLabel">0% সম্পূর্ণ</span>
+              </div>
+              <div class="bar-wrap"><div class="bar" id="progressBar"></div></div>
+            </div>
+
+            <div class="goal-card full" id="goalCard">ইনপুট দিয়ে <b>হিসাব দেখাও</b> চাপলে এখানে target summary দেখাবে।</div>
+            <div class="summary-card full" id="summaryText">এখানে session analysis দেখাবে।</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Developer:
+      <a href="https://t.me/TraderFaisalAhmed" target="_blank">Trader Faisal Ahmed</a>
+      <br>
+      Premium Bangla Glass UI Trading Planner Pro + MTG / OTM
+    </div>
+  </div>
+
+  <script>
+    const typingMessage = "বাংলা গ্লাস UI ট্রেডিং প্ল্যানার Pro + MTG / OTM";
+    let typingIndex = 0;
+
+    function startTyping() {
+      const target = document.getElementById("typingText");
+      if (typingIndex < typingMessage.length) {
+        target.textContent += typingMessage.charAt(typingIndex);
+        typingIndex++;
+        setTimeout(startTyping, 55);
+      }
+    }
+
+    function money(n) { return "$" + Number(n).toFixed(2); }
+    function flashButton(btn) {
+      if (!btn) return;
+      btn.classList.add("active-click");
+      setTimeout(() => btn.classList.remove("active-click"), 350);
+    }
+
+    function setPreset(balance, target, trade, payout, btn) {
+      document.getElementById("balance").value = balance;
+      document.getElementById("targetProfit").value = target;
+      document.getElementById("tradeAmount").value = trade;
+      document.getElementById("payout").value = payout;
+      document.getElementById("mtgBase").value = trade;
+      flashButton(btn);
+      calculatePlan();
+      calculateMTG();
+    }
+
+    function addWin(btn) {
+      const winsEl = document.getElementById("wins");
+      const currentProfitEl = document.getElementById("currentProfit");
+      const tradeAmount = parseFloat(document.getElementById("tradeAmount").value) || 0;
+      const payout = parseFloat(document.getElementById("payout").value) || 0;
+      const profitPerWin = tradeAmount * (payout / 100);
+
+      winsEl.value = (parseInt(winsEl.value) || 0) + 1;
+      currentProfitEl.value = ((parseFloat(currentProfitEl.value) || 0) + profitPerWin).toFixed(2);
+
+      flashButton(btn);
+      calculatePlan();
+    }
+
+    function addLoss(btn) {
+      const lossesEl = document.getElementById("losses");
+      const currentProfitEl = document.getElementById("currentProfit");
+      const tradeAmount = parseFloat(document.getElementById("tradeAmount").value) || 0;
+
+      lossesEl.value = (parseInt(lossesEl.value) || 0) + 1;
+      currentProfitEl.value = ((parseFloat(currentProfitEl.value) || 0) - tradeAmount).toFixed(2);
+
+      flashButton(btn);
+      calculatePlan();
+    }
+
+    function resetSessionStats(btn) {
+      document.getElementById("wins").value = 0;
+      document.getElementById("losses").value = 0;
+      document.getElementById("currentProfit").value = 0;
+      flashButton(btn);
+      calculatePlan();
+    }
+
+    function calculatePlan() {
+      const balance = parseFloat(document.getElementById("balance").value) || 0;
+      const targetProfit = parseFloat(document.getElementById("targetProfit").value) || 0;
+      const currentProfit = parseFloat(document.getElementById("currentProfit").value) || 0;
+      const tradeAmount = parseFloat(document.getElementById("tradeAmount").value) || 0;
+      const payout = parseFloat(document.getElementById("payout").value) || 0;
+      const wins = parseInt(document.getElementById("wins").value) || 0;
+      const losses = parseInt(document.getElementById("losses").value) || 0;
+      const riskPercent = parseFloat(document.getElementById("riskPercent").value) || 0;
+      const maxLossStreak = parseInt(document.getElementById("maxLossStreak").value) || 0;
+
+      const profitPerWin = tradeAmount * (payout / 100);
+      const totalTrades = wins + losses;
+      const sessionNet = currentProfit;
+      const remainingProfit = Math.max(0, targetProfit - sessionNet);
+      const targetPercent = targetProfit > 0 ? Math.min(Math.max((sessionNet / targetProfit) * 100, 0), 100) : 0;
+      const winsNeeded = profitPerWin > 0 ? Math.ceil(remainingProfit / profitPerWin) : 0;
+      const streakLoss = maxLossStreak * tradeAmount;
+      const stopLoss = balance * (riskPercent / 100);
+      const afterOneWin = Math.max(0, targetProfit - (sessionNet + profitPerWin));
+      const afterOneLoss = Math.max(0, targetProfit - (sessionNet - tradeAmount));
+      const targetBalance = balance + targetProfit;
+      const exposure = totalTrades * tradeAmount;
+      const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0;
+
+      let riskLevel = "", riskClass = "";
+      if (streakLoss < stopLoss * 0.7) { riskLevel = "নিরাপদ"; riskClass = "green"; }
+      else if (streakLoss <= stopLoss) { riskLevel = "মাঝারি"; riskClass = "yellow"; }
+      else { riskLevel = "উচ্চ ঝুঁকি"; riskClass = "red"; }
+
+      let sessionStatus = "", sessionClass = "";
+      if (sessionNet >= targetProfit && targetProfit > 0) { sessionStatus = "টার্গেট পূরণ"; sessionClass = "green"; }
+      else if (sessionNet > 0) { sessionStatus = "প্রফিটে আছো"; sessionClass = "cyan"; }
+      else if (sessionNet < 0) { sessionStatus = "লসে আছো"; sessionClass = "red"; }
+      else { sessionStatus = "শুরু হয়নি"; sessionClass = "pink"; }
+
+      let recommendation = "", recommendationClass = "";
+      if (sessionNet >= targetProfit && targetProfit > 0) { recommendation = "আজ stop করা ভালো"; recommendationClass = "green"; }
+      else if (streakLoss > stopLoss) { recommendation = "trade amount কমাও"; recommendationClass = "red"; }
+      else if (winRate >= 60 && totalTrades >= 3) { recommendation = "steady থাকো"; recommendationClass = "cyan"; }
+      else { recommendation = "ধীরে plan follow করো"; recommendationClass = "yellow"; }
+
+      document.getElementById("profitPerWin").textContent = money(profitPerWin);
+      document.getElementById("remainingProfit").textContent = money(remainingProfit);
+      document.getElementById("targetPercent").textContent = targetPercent.toFixed(1) + "%";
+      document.getElementById("winsNeeded").textContent = winsNeeded;
+      document.getElementById("totalTrades").textContent = totalTrades;
+
+      const netResultEl = document.getElementById("netResult");
+      netResultEl.textContent = money(sessionNet);
+      netResultEl.className = "value " + (sessionNet >= 0 ? "green" : "red");
+
+      document.getElementById("winRate").textContent = winRate.toFixed(1) + "%";
+      document.getElementById("streakLoss").textContent = money(streakLoss);
+      document.getElementById("stopLoss").textContent = money(stopLoss);
+
+      const riskEl = document.getElementById("riskLevel");
+      riskEl.textContent = riskLevel;
+      riskEl.className = "value " + riskClass;
+
+      document.getElementById("afterOneWin").textContent = money(afterOneWin);
+      document.getElementById("afterOneLoss").textContent = money(afterOneLoss);
+      document.getElementById("targetBalance").textContent = money(targetBalance);
+      document.getElementById("exposure").textContent = money(exposure);
+
+      const statusEl = document.getElementById("sessionStatus");
+      statusEl.textContent = sessionStatus;
+      statusEl.className = "value " + sessionClass;
+
+      const recEl = document.getElementById("recommendation");
+      recEl.textContent = recommendation;
+      recEl.className = "value " + recommendationClass;
+
+      document.getElementById("progressBar").style.width = targetPercent + "%";
+      document.getElementById("progressLabel").textContent = targetPercent.toFixed(1) + "% সম্পূর্ণ";
+
+      document.getElementById("goalCard").innerHTML = `
+        আজকের target <b>${money(targetProfit)}</b>।
+        এখন পর্যন্ত session result <b>${money(sessionNet)}</b>।
+        তাই target full হতে এখনও <b>${money(remainingProfit)}</b> দরকার।
+        <br><br>
+        প্রতি winning trade এ আনুমানিক <b>${money(profitPerWin)}</b> profit হলে,
+        আরও <b>${winsNeeded}</b>টা clean win লাগতে পারে।
+      `;
+
+      let summary = `
+        তোমার মোট trade হয়েছে <b>${totalTrades}</b>টা এবং win rate <b>${winRate.toFixed(1)}%</b>।
+        loss streak limit <b>${maxLossStreak}</b> পর্যন্ত গেলে মোট লস হবে <b>${money(streakLoss)}</b>।
+        suggested stop loss হচ্ছে <b>${money(stopLoss)}</b>।
+        <br><br>
+        একটি win হলে target বাকি থাকবে <b>${money(afterOneWin)}</b>।
+        একটি loss হলে target বাকি থাকবে <b>${money(afterOneLoss)}</b>।
+        আজকের target balance হবে <b>${money(targetBalance)}</b>।
+      `;
+
+      if (sessionNet >= targetProfit && targetProfit > 0) summary += `<br><br><b>অভিনন্দন:</b> তোমার আজকের টার্গেট পূরণ হয়েছে।`;
+      else if (streakLoss > stopLoss) summary += `<br><br><b>সতর্কতা:</b> তোমার বর্তমান loss streak setup, risk limit-এর চেয়ে বেশি।`;
+      else summary += `<br><br><b>নোট:</b> steady থাকলে target-এর কাছে যাওয়া সহজ হবে।`;
+
+      document.getElementById("summaryText").innerHTML = summary;
+    }
+
+    function calculateMTG() {
+      const mode = document.getElementById("mode").value;
+      const base = parseFloat(document.getElementById("mtgBase").value) || 0;
+      const steps = parseInt(document.getElementById("mtgSteps").value) || 1;
+      const mult = parseFloat(document.getElementById("mtgMultiplier").value) || 1;
+      const extra = parseFloat(document.getElementById("extraTarget").value) || 0;
+      const payout = parseFloat(document.getElementById("payout").value) || 0;
+
+      let rows = [];
+      let totalExposure = 0;
+      let lastStep = 0;
+      let lastReturn = 0;
+
+      for (let i = 1; i <= steps; i++) {
+        let amount;
+        if (mode === "mtg") {
+          const prevExposure = totalExposure;
+          amount = i === 1 ? base : ((prevExposure + extra) / (payout / 100));
+        } else {
+          amount = base * Math.pow(mult, i - 1);
+        }
+
+        amount = Number(amount.toFixed(2));
+        totalExposure = Number((totalExposure + amount).toFixed(2));
+        const grossReturn = Number((amount * (1 + payout / 100)).toFixed(2));
+        const netProfitIfWin = Number((grossReturn - totalExposure).toFixed(2));
+
+        rows.push({
+          step: i,
+          amount: amount,
+          exposure: totalExposure,
+          grossReturn: grossReturn,
+          netProfitIfWin: netProfitIfWin
+        });
+
+        lastStep = amount;
+        lastReturn = grossReturn;
+      }
+
+      document.getElementById("mtgTotalExposure").textContent = money(totalExposure);
+      document.getElementById("mtgLastStep").textContent = money(lastStep);
+      document.getElementById("mtgLastReturn").textContent = money(lastReturn);
+
+      let html = `<b>${mode === "mtg" ? "MTG Recovery Table" : "OTM Fixed Multiplier Table"}</b>
+      <table>
+        <thead>
+          <tr>
+            <th>Step</th>
+            <th>Amount</th>
+            <th>Total Exposure</th>
+            <th>Return</th>
+            <th>Win হলে Net</th>
+          </tr>
+        </thead>
+        <tbody>`;
+
+      rows.forEach(r => {
+        html += `<tr>
+          <td>${r.step}</td>
+          <td>${money(r.amount)}</td>
+          <td>${money(r.exposure)}</td>
+          <td>${money(r.grossReturn)}</td>
+          <td>${money(r.netProfitIfWin)}</td>
+        </tr>`;
+      });
+
+      html += `</tbody></table>
+      <div style="margin-top:10px;">
+        <b>নোট:</b> MTG mode-এ প্রতিটি পরের step এমনভাবে ধরা হয়েছে যাতে আগের exposure recover করে কিছু extra target রাখা যায়। OTM mode-এ শুধু fixed multiplier অনুযায়ী amount বাড়ে।
+      </div>`;
+
+      document.getElementById("mtgTableCard").innerHTML = html;
+    }
+
+    function resetForm() {
+      document.getElementById("balance").value = 30;
+      document.getElementById("targetProfit").value = 4;
+      document.getElementById("currentProfit").value = 0;
+      document.getElementById("tradeAmount").value = 1;
+      document.getElementById("payout").value = 85;
+      document.getElementById("wins").value = 0;
+      document.getElementById("losses").value = 0;
+      document.getElementById("riskPercent").value = 10;
+      document.getElementById("maxLossStreak").value = 3;
+      document.getElementById("mtgBase").value = 1;
+      document.getElementById("mtgSteps").value = 4;
+      document.getElementById("mtgMultiplier").value = 2;
+      document.getElementById("extraTarget").value = 0.20;
+      document.getElementById("mode").value = "mtg";
+      calculatePlan();
+      calculateMTG();
+    }
+
+    startTyping();
+    calculatePlan();
+    calculateMTG();
+  </script>
+</body>
+</html>
